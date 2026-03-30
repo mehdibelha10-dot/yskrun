@@ -1,0 +1,861 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YskRun – L'Ebook</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --white: #f5f5f0;
+    --orange: #ff4d00;
+    --grey: #1a1a1a;
+    --mid: #2e2e2e;
+    --text-muted: #888;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 60px 24px;
+    position: relative;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,77,0,0.18) 0%, transparent 70%),
+      var(--black);
+  }
+
+  .hero-tag {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--orange);
+    border: 1px solid rgba(255,77,0,0.35);
+    padding: 6px 16px;
+    border-radius: 2px;
+    margin-bottom: 32px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(68px, 14vw, 160px);
+    line-height: 0.88;
+    letter-spacing: -0.01em;
+    animation: fadeUp 0.7s 0.1s ease both;
+  }
+
+  .hero-title .accent { color: var(--orange); }
+
+  .hero-sub {
+    font-size: clamp(15px, 2vw, 18px);
+    color: #aaa;
+    font-weight: 300;
+    max-width: 520px;
+    line-height: 1.65;
+    margin-top: 28px;
+    animation: fadeUp 0.7s 0.2s ease both;
+  }
+
+  .hero-cta {
+    margin-top: 44px;
+    display: inline-block;
+    background: var(--orange);
+    color: var(--black);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 16px 40px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    animation: fadeUp 0.7s 0.3s ease both;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .hero-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(255,77,0,0.35);
+  }
+
+  .hero-scroll {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    animation: fadeUp 1s 0.8s ease both;
+  }
+  .hero-scroll::after {
+    content: '';
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--text-muted), transparent);
+    animation: pulse 1.8s infinite;
+  }
+
+  /* ── STRIP ── */
+  .strip {
+    background: var(--orange);
+    color: var(--black);
+    padding: 14px 0;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .strip-inner {
+    display: inline-flex;
+    gap: 60px;
+    animation: marquee 18s linear infinite;
+  }
+  .strip span {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 0.12em;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    padding: 100px 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--orange);
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(42px, 6vw, 72px);
+    line-height: 0.95;
+    margin-bottom: 48px;
+  }
+
+  /* ── PROBLÈME / SOLUTION ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+  @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+  .col-card {
+    background: var(--grey);
+    padding: 40px 36px;
+  }
+  .col-card.orange { background: var(--orange); color: var(--black); }
+
+  .col-card h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 30px;
+    letter-spacing: 0.04em;
+    margin-bottom: 20px;
+  }
+  .col-card ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .col-card ul li {
+    font-size: 14px;
+    line-height: 1.55;
+    font-weight: 300;
+    padding-left: 20px;
+    position: relative;
+  }
+  .col-card ul li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    font-weight: 700;
+  }
+  .col-card.orange ul li::before { color: var(--black); }
+  .col-card ul li::before { color: var(--orange); }
+
+  /* ── WHAT'S INSIDE ── */
+  .inside-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 2px;
+  }
+
+  .inside-card {
+    background: var(--grey);
+    padding: 36px 30px;
+    transition: background 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .inside-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 0;
+    background: var(--orange);
+    transition: height 0.3s ease;
+  }
+  .inside-card:hover::before { height: 100%; }
+  .inside-card:hover { background: var(--mid); }
+
+  .inside-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    color: rgba(255,77,0,0.18);
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+  .inside-card h4 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .inside-card p {
+    font-size: 13px;
+    color: #999;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* ── SITES COUNT ── */
+  .stats-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin-top: 48px;
+  }
+  .stat-box {
+    flex: 1 1 180px;
+    background: var(--grey);
+    padding: 32px 28px;
+    text-align: center;
+  }
+  .stat-box .num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 60px;
+    color: var(--orange);
+    line-height: 1;
+  }
+  .stat-box .label {
+    font-size: 12px;
+    color: #888;
+    font-weight: 300;
+    margin-top: 6px;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── PLATFORMS ── */
+  .tags-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 32px;
+  }
+  .tag {
+    background: var(--grey);
+    border: 1px solid var(--mid);
+    color: #ccc;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 8px 14px;
+    letter-spacing: 0.04em;
+    transition: all 0.15s;
+  }
+  .tag:hover { background: var(--orange); color: var(--black); border-color: var(--orange); }
+  .tag.highlight { border-color: var(--orange); color: var(--orange); }
+
+  /* ── MÉTHODE ── */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    counter-reset: step;
+  }
+  .step {
+    display: flex;
+    align-items: flex-start;
+    gap: 28px;
+    background: var(--grey);
+    padding: 28px 32px;
+    counter-increment: step;
+  }
+  .step-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: var(--orange);
+    line-height: 1;
+    min-width: 48px;
+  }
+  .step-body h4 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .step-body p { font-size: 13px; color: #999; line-height: 1.6; font-weight: 300; }
+
+  /* ── CTA FINAL ── */
+  .cta-section {
+    background: radial-gradient(ellipse 100% 120% at 50% 100%, rgba(255,77,0,0.22) 0%, transparent 65%), var(--grey);
+    padding: 100px 24px;
+    text-align: center;
+  }
+  .cta-section .big-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(52px, 10vw, 120px);
+    line-height: 0.9;
+    margin-bottom: 24px;
+  }
+  .cta-section p {
+    color: #999;
+    font-size: 15px;
+    max-width: 480px;
+    margin: 0 auto 40px;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--black);
+    border-top: 1px solid #1e1e1e;
+    padding: 28px 24px;
+    text-align: center;
+    font-size: 12px;
+    color: #444;
+    letter-spacing: 0.08em;
+  }
+
+  /* ── TABS ── */
+  .tab-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 2px;
+  }
+  .tab-btn {
+    background: var(--grey);
+    color: #aaa;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 12px 18px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .tab-btn:hover { background: var(--mid); color: var(--white); }
+  .tab-btn.active { background: var(--orange); color: var(--black); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .links-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2px;
+  }
+  .link-group {
+    background: var(--grey);
+    padding: 28px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .link-group-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .link-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--white);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 400;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.03);
+    border-left: 2px solid transparent;
+    transition: all 0.15s;
+  }
+  .link-row:hover { background: rgba(255,77,0,0.1); border-left-color: var(--orange); }
+  .link-row span { color: var(--orange); font-size: 16px; }
+  .link-row.orange-link { border-left-color: rgba(255,77,0,0.3); }
+  .link-row.orange-link:hover { border-left-color: var(--orange); background: rgba(255,77,0,0.15); }
+  .link-note {
+    font-size: 12px;
+    color: #888;
+    margin-top: 12px;
+    padding: 12px;
+    border: 1px solid rgba(255,77,0,0.2);
+    line-height: 1.6;
+  }
+  .link-note strong { color: var(--orange); }
+  .secret-banner {
+    background: linear-gradient(90deg, rgba(255,77,0,0.15), rgba(255,77,0,0.05));
+    border-left: 3px solid var(--orange);
+    padding: 14px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #ddd;
+    margin-bottom: 2px;
+  }
+  /* ── CONTACT ── */
+  .contact-block {
+    background: var(--grey);
+    padding: 56px 40px;
+    max-width: 560px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+  }
+  .contact-icon { font-size: 48px; }
+  .contact-block h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 0.04em;
+  }
+  .contact-block p { font-size: 14px; color: #999; line-height: 1.65; max-width: 400px; }
+  .contact-block strong { color: var(--orange); }
+  .wa-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: #25D366;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    padding: 16px 36px;
+    text-decoration: none;
+    margin: 8px 0;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .wa-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(37,211,102,0.3); }
+  .contact-note { font-size: 12px !important; color: #555 !important; font-style: italic; }
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  /* Appear on scroll */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.65s ease, transform 0.65s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-tag">YskRun — Guide Exclusif</div>
+  <h1 class="hero-title">
+    HABILLE-TOI<br>
+    RARE.<br>
+    <span class="accent">PAS CHER.</span>
+  </h1>
+  <p class="hero-sub">
+    Les pièces Nike & Under Armour introuvables en France existent ailleurs — à une fraction du prix. Ce guide te donne les sites, la méthode et l'accès direct.
+  </p>
+  <a href="#inside" class="hero-cta">Découvrir le guide →</a>
+  <div class="hero-scroll">scroll</div>
+</section>
+
+<!-- STRIP -->
+<div class="strip">
+  <div class="strip-inner">
+    <span>NIKE RUNNING DIVISION</span><span>•</span>
+    <span>UNDER ARMOUR RARE</span><span>•</span>
+    <span>TOKYO</span><span>•</span>
+    <span>FAST HYBRID</span><span>•</span>
+    <span>PHENOM ELITE</span><span>•</span>
+    <span>TRAIL</span><span>•</span>
+    <span>ZABUZA</span><span>•</span>
+    <span>DIVISION ELEMENT</span><span>•</span>
+    <span>PIÈCES RARES NEUVES</span><span>•</span>
+    <span>NIKE RUNNING DIVISION</span><span>•</span>
+    <span>UNDER ARMOUR RARE</span><span>•</span>
+    <span>TOKYO</span><span>•</span>
+    <span>FAST HYBRID</span><span>•</span>
+    <span>PHENOM ELITE</span><span>•</span>
+    <span>TRAIL</span><span>•</span>
+    <span>ZABUZA</span><span>•</span>
+    <span>DIVISION ELEMENT</span><span>•</span>
+    <span>PIÈCES RARES NEUVES</span><span>•</span>
+  </div>
+</div>
+
+<!-- PROBLÈME / SOLUTION -->
+<section class="section reveal">
+  <div class="section-label">Le problème</div>
+  <h2 class="section-title">POURQUOI<br>C'EST SI DUR<br>À TROUVER</h2>
+  <div class="two-col">
+    <div class="col-card">
+      <h3>En France 🇫🇷</h3>
+      <ul>
+        <li>Prix gonflés par la demande et la hype</li>
+        <li>Stocks épuisés en quelques minutes</li>
+        <li>Revente à 2× ou 3× le prix boutique</li>
+        <li>Les mêmes pièces introuvables depuis des mois</li>
+      </ul>
+    </div>
+    <div class="col-card orange">
+      <h3>Ailleurs dans le monde 🌍</h3>
+      <ul>
+        <li>Pas de hype locale → prix normaux</li>
+        <li>Stocks disponibles, neuf étiquette</li>
+        <li>Modèles identiques, parfois moitié prix</li>
+        <li>Opportunité ignorée par 99% des gens</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="section reveal" style="padding-top:0">
+  <div class="section-label">Ce que tu obtiens</div>
+  <h2 class="section-title" id="inside">LE GUIDE<br>EN CHIFFRES</h2>
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="num">40+</div>
+      <div class="label">Sites étrangers listés</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">8</div>
+      <div class="label">Pays couverts</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">2</div>
+      <div class="label">Sources exclusives<br>utilisées par l'auteur</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">1</div>
+      <div class="label">Accompagnement<br>première commande</div>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT'S INSIDE -->
+<section class="section reveal" style="padding-top:0">
+  <div class="section-label">Contenu du guide</div>
+  <h2 class="section-title">4 CHOSES<br>QUE TU VAS<br>APPRENDRE</h2>
+  <div class="inside-grid">
+    <div class="inside-card">
+      <div class="inside-num">01</div>
+      <h4>Les 40 sites étrangers</h4>
+      <p>Europe, USA, Japon, Asie — une liste complète de plateformes où les prix défient toute concurrence française.</p>
+    </div>
+    <div class="inside-card">
+      <div class="inside-num">02</div>
+      <h4>Pourquoi les prix varient</h4>
+      <p>Comprendre la logique marché derrière les différences de prix selon les pays, pour repérer les meilleures opportunités.</p>
+    </div>
+    <div class="inside-card">
+      <div class="inside-num">03</div>
+      <h4>La méthode de réexpédition</h4>
+      <p>Comment commander depuis n'importe quel pays et recevoir tes pièces en France — étape par étape, sans stress.</p>
+    </div>
+    <div class="inside-card">
+      <div class="inside-num">04</div>
+      <h4>Les 2 sites secrets de l'auteur</h4>
+      <p>prom.ua et FINN.no — les deux plateformes utilisées personnellement, avec des liens d'articles concrets pour démarrer.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PLATFORMS -->
+<section class="section reveal" style="padding-top:0">
+  <div class="section-label">Plateformes incluses</div>
+  <h2 class="section-title">OÙ TROUVER<br>LES PIÈCES</h2>
+  <div class="tags-wrap">
+    <span class="tag highlight">prom.ua ⭐</span>
+    <span class="tag highlight">FINN.no ⭐</span>
+    <span class="tag">Vinted IT / UK / US</span>
+    <span class="tag">Grailed</span>
+    <span class="tag">Depop</span>
+    <span class="tag">Kleinanzeigen</span>
+    <span class="tag">Subito.it</span>
+    <span class="tag">Marktplaats</span>
+    <span class="tag">Yahoo Japan</span>
+    <span class="tag">Mercari Japan</span>
+    <span class="tag">Kream.co.kr</span>
+    <span class="tag">Wallapop</span>
+    <span class="tag">OLX (7 pays)</span>
+    <span class="tag">Poshmark</span>
+    <span class="tag">Shopee</span>
+    <span class="tag">Lazada</span>
+    <span class="tag">Coupang</span>
+    <span class="tag">Ricardo.ch</span>
+    <span class="tag">Willhaben.at</span>
+    <span class="tag">Enjoei</span>
+    <span class="tag">+ beaucoup d'autres</span>
+  </div>
+</section>
+
+<!-- MÉTHODE RÉEXPÉDITION -->
+<section class="section reveal" style="padding-top:0">
+  <div class="section-label">Comment ça marche</div>
+  <h2 class="section-title">COMMANDER<br>À L'ÉTRANGER<br>EN 5 ÉTAPES</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-body">
+        <h4>Tu t'inscris sur un service de réexpédition</h4>
+        <p>ColisExpat, Forward2Me, Shipito… Tu obtiens une adresse d'entrepôt dans le pays cible.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-body">
+        <h4>Tu commandes sur le site étranger</h4>
+        <p>Tu indiques l'adresse de l'entrepôt comme adresse de livraison.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-body">
+        <h4>Le colis arrive à l'entrepôt</h4>
+        <p>Tu reçois une notification. La pièce est en sécurité, prête à être expédiée.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-body">
+        <h4>Tu valides la réexpédition vers la France</h4>
+        <p>En quelques clics depuis ton espace client.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">05</div>
+      <div class="step-body">
+        <h4>Tu reçois ta pièce chez toi</h4>
+        <p>Neuve, étiquette, à un prix que personne autour de toi ne pouvait imaginer.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TABS SECTION -->
+<section class="section reveal" style="padding-top:0" id="acces">
+  <div class="section-label">Accès direct</div>
+  <h2 class="section-title">TOUS LES<br>LIENS &<br>CONTACTS</h2>
+
+  <!-- Tab Nav -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="showTab('europe')">🇪🇺 Europe</button>
+    <button class="tab-btn" onclick="showTab('japan')">🇯🇵 Japon & Asie</button>
+    <button class="tab-btn" onclick="showTab('usa')">🇺🇸 USA & International</button>
+    <button class="tab-btn" onclick="showTab('secret')">⭐ Sites Secrets</button>
+    <button class="tab-btn" onclick="showTab('reexp')">📦 Réexpédition</button>
+    <button class="tab-btn" onclick="showTab('contact')">💬 Contact</button>
+  </div>
+
+  <!-- Tab: Europe -->
+  <div class="tab-content active" id="tab-europe">
+    <div class="links-grid">
+      <div class="link-group">
+        <div class="link-group-title">🔁 Seconde main / Généralistes</div>
+        <a href="https://www.vinted.it" target="_blank" class="link-row">Vinted IT <span>→</span></a>
+        <a href="https://www.vinted.com" target="_blank" class="link-row">Vinted US <span>→</span></a>
+        <a href="https://www.vinted.co.uk" target="_blank" class="link-row">Vinted UK <span>→</span></a>
+        <a href="https://www.vinted.be" target="_blank" class="link-row">Vinted Belgique <span>→</span></a>
+        <a href="https://www.depop.com" target="_blank" class="link-row">Depop <span>→</span></a>
+        <a href="https://www.grailed.com" target="_blank" class="link-row">Grailed <span>→</span></a>
+        <a href="https://www.poshmark.com" target="_blank" class="link-row">Poshmark <span>→</span></a>
+        <a href="https://www.vestiairecollective.com" target="_blank" class="link-row">Vestiaire Collective <span>→</span></a>
+        <a href="https://www.wallapop.com" target="_blank" class="link-row">Wallapop <span>→</span></a>
+      </div>
+      <div class="link-group">
+        <div class="link-group-title">🇪🇺 Sites locaux européens</div>
+        <a href="https://www.subito.it" target="_blank" class="link-row">Subito.it — Italie <span>→</span></a>
+        <a href="https://www.ricardo.ch" target="_blank" class="link-row">Ricardo.ch — Suisse <span>→</span></a>
+        <a href="https://www.kleinanzeigen.de" target="_blank" class="link-row">Kleinanzeigen — Allemagne <span>→</span></a>
+        <a href="https://www.kleiderkreisel.de" target="_blank" class="link-row">Kleiderkreisel <span>→</span></a>
+        <a href="https://www.marktplaats.nl" target="_blank" class="link-row">Marktplaats — Pays-Bas <span>→</span></a>
+        <a href="https://www.willhaben.at" target="_blank" class="link-row">Willhaben — Autriche <span>→</span></a>
+        <a href="https://www.tise.com" target="_blank" class="link-row">Tise.com <span>→</span></a>
+      </div>
+      <div class="link-group">
+        <div class="link-group-title">🌐 Réseau OLX</div>
+        <a href="https://www.olx.de" target="_blank" class="link-row">OLX Allemagne <span>→</span></a>
+        <a href="https://www.olx.at" target="_blank" class="link-row">OLX Autriche <span>→</span></a>
+        <a href="https://www.olx.bg" target="_blank" class="link-row">OLX Bulgarie <span>→</span></a>
+        <a href="https://www.olx.sk" target="_blank" class="link-row">OLX Slovaquie <span>→</span></a>
+        <a href="https://www.olx.nl" target="_blank" class="link-row">OLX Pays-Bas <span>→</span></a>
+        <a href="https://www.olx.com.br" target="_blank" class="link-row">OLX Brésil <span>→</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Japon & Asie -->
+  <div class="tab-content" id="tab-japan">
+    <div class="links-grid">
+      <div class="link-group">
+        <div class="link-group-title">🇯🇵 Japon (via proxy)</div>
+        <a href="https://www.fromjapan.co.jp" target="_blank" class="link-row">FromJapan <span>→</span></a>
+        <a href="https://auctions.yahoo.co.jp" target="_blank" class="link-row">Yahoo Japan Auctions <span>→</span></a>
+        <a href="https://jp.mercari.com" target="_blank" class="link-row">Mercari Japan <span>→</span></a>
+      </div>
+      <div class="link-group">
+        <div class="link-group-title">🌏 Asie</div>
+        <a href="https://www.lazada.com" target="_blank" class="link-row">Lazada <span>→</span></a>
+        <a href="https://www.shopee.com" target="_blank" class="link-row">Shopee <span>→</span></a>
+        <a href="https://www.coupang.com" target="_blank" class="link-row">Coupang — Corée <span>→</span></a>
+        <a href="https://www.kream.co.kr" target="_blank" class="link-row">Kream.co.kr — Corée <span>→</span></a>
+        <a href="https://www.carousell.com" target="_blank" class="link-row">Carousell <span>→</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: USA & International -->
+  <div class="tab-content" id="tab-usa">
+    <div class="links-grid">
+      <div class="link-group">
+        <div class="link-group-title">🇺🇸 USA & International</div>
+        <a href="https://www.grailed.com" target="_blank" class="link-row">Grailed <span>→</span></a>
+        <a href="https://www.depop.com" target="_blank" class="link-row">Depop USA <span>→</span></a>
+        <a href="https://www.poshmark.com" target="_blank" class="link-row">Poshmark <span>→</span></a>
+        <a href="https://www.heroine.com" target="_blank" class="link-row">Heroine.com <span>→</span></a>
+        <a href="https://www.enjoei.com.br" target="_blank" class="link-row">Enjoei — Brésil <span>→</span></a>
+        <a href="https://www.myntra.com" target="_blank" class="link-row">Myntra — Inde <span>→</span></a>
+        <a href="https://www.facebook.com/marketplace" target="_blank" class="link-row">Facebook Marketplace Mexique <span>→</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Sites Secrets -->
+  <div class="tab-content" id="tab-secret">
+    <div class="secret-banner">⭐ Sites utilisés personnellement par YskRun pour générer des revenus</div>
+    <div class="links-grid">
+      <div class="link-group">
+        <div class="link-group-title">📘 prom.ua — Ukraine (neuf étiquette)</div>
+        <a href="https://prom.ua/ua/p2184419071-alloriginal-com-shtani.html" target="_blank" class="link-row orange-link">Bas Division Araignée <span>→</span></a>
+        <a href="https://prom.ua/ua/p2181035293-alloriginal-com-vitrovka.html" target="_blank" class="link-row orange-link">Veste D.Y.E. <span>→</span></a>
+        <a href="https://prom.ua/ua/p2181035289-alloriginal-com-vitrovka.html" target="_blank" class="link-row orange-link">Veste Windrunner <span>→</span></a>
+        <div class="link-note">⚠️ Pour commander sur prom.ua, passe par l'agent WhatsApp ci-dessous et mentionne que tu viens de la part de <strong>YskRun</strong>.</div>
+      </div>
+      <div class="link-group">
+        <div class="link-group-title">🇳🇴 FINN.no — Norvège (prix défiants toute concurrence)</div>
+        <a href="https://www.finn.no/recommerce/forsale/item/428399913" target="_blank" class="link-row orange-link">Zip Division <span>→</span></a>
+        <a href="https://www.finn.no/recommerce/forsale/item/428400493" target="_blank" class="link-row orange-link">Haut Running Tokyo <span>→</span></a>
+        <a href="https://www.finn.no/recommerce/forsale/item/435794361" target="_blank" class="link-row orange-link">Bas Phenom Elite Track <span>→</span></a>
+        <a href="https://www.finn.no/recommerce/forsale/item/432239350" target="_blank" class="link-row orange-link">Veste Division Element <span>→</span></a>
+        <a href="https://www.finn.no/recommerce/forsale/item/411497419" target="_blank" class="link-row orange-link">Haut Futur Fast <span>→</span></a>
+        <a href="https://www.finn.no/recommerce/forsale/item/371845844" target="_blank" class="link-row orange-link">Haut Nike Track <span>→</span></a>
+        <a href="https://www.finn.no/recommerce/forsale/item/418321264" target="_blank" class="link-row orange-link">Veste Division <span>→</span></a>
+        <a href="https://www.finn.no/recommerce/forsale/item/445174735" target="_blank" class="link-row orange-link">Bas Phenom Elite <span>→</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Réexpédition -->
+  <div class="tab-content" id="tab-reexp">
+    <div class="links-grid">
+      <div class="link-group">
+        <div class="link-group-title">📦 Services de réexpédition</div>
+        <a href="https://www.colisexpat.com" target="_blank" class="link-row">ColisExpat <span>→</span></a>
+        <a href="https://www.forward2me.com" target="_blank" class="link-row">Forward2Me <span>→</span></a>
+        <a href="https://www.shipito.com" target="_blank" class="link-row">Shipito <span>→</span></a>
+        <a href="https://www.stackry.com" target="_blank" class="link-row">Stackry <span>→</span></a>
+        <a href="https://www.myus.com" target="_blank" class="link-row">MyUS <span>→</span></a>
+        <a href="https://www.eshopwedrop.com" target="_blank" class="link-row">EshopWedrop <span>→</span></a>
+        <a href="https://www.planetexpress.com" target="_blank" class="link-row">Planet Express <span>→</span></a>
+        <a href="https://www.buyandship.com" target="_blank" class="link-row">Buyandship <span>→</span></a>
+        <a href="https://www.viabox.com" target="_blank" class="link-row">ViaBox <span>→</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Contact -->
+  <div class="tab-content" id="tab-contact">
+    <div class="contact-block">
+      <div class="contact-icon">💬</div>
+      <h3>Agent WhatsApp — prom.ua</h3>
+      <p>Pour commander sur prom.ua, envoie le lien de l'article à cet agent WhatsApp. N'oublie pas de préciser que tu viens de la part de <strong>YskRun</strong>.</p>
+      <a href="https://wa.me/380952595824" target="_blank" class="wa-btn">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        +380 95 259 5824
+      </a>
+      <p class="contact-note">Horaires variables selon le fuseau horaire. Sois patient, la réponse peut prendre quelques heures.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  © 2025 YskRun — Guide Exclusif — Tous droits réservés
+</footer>
+
+<script>
+  function showTab(id) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    event.currentTarget.classList.add('active');
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
